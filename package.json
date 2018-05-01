@@ -1,0 +1,19 @@
+{
+  "name": "augusta",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lndvieira/augusta.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lndvieira/augusta/issues"
+  },
+  "homepage": "https://github.com/lndvieira/augusta#readme"
+}
