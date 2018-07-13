@@ -61,57 +61,54 @@ var OAuth2Client = google.google.auth.OAuth2;
 
 //------------------- Azure
 
-exports.getLanguage = functions.https.onRequest(function(request,response){
-	console.log('vai chamar o get language');
-	get_language (documents , function(err, data){
+exports.getLanguage = functions.https.onRequest((req, res) =>{
+	console.log("##getLanguage##");
+
+	var dados = JSON.parse(req.body);
+
+	console.log("text: " + dados.documents[0].text);
+
+	get_language (dados , function(err, data){
 		console.log(data);
-		response.send(data);
+		res.send(data);
 	});
-	//get_sentiments (documents);
-	//get_key_phrases (documents);
 })
 
-let response_handler = function(response) {
-    let body = '';
-    response.on ('data', function (d) {
-        body += d;
-    });
-    response.on ('end', function () {
-        let body_ = JSON.parse (body);
-        let body__ = JSON.stringify (body_, null, '  ');
-        console.log (body__);
+exports.getSentiment = functions.https.onRequest((req, res) =>{
+	console.log("##getSentiment##");
 
-    });
-    response.on ('error', function (e) {
-        console.log ('Error: ' + e.message);
-    });
-};
+	var dados = JSON.parse(req.body);
+
+	console.log("text: " + dados.documents[0].text);
+	
+	get_sentiments (dados , function(err, data){
+		console.log(data);
+		res.send(data);
+	});
+})
+
+exports.getKeyPhrases = functions.https.onRequest((req, res) =>{
+	console.log("##getKeyPhrases##");
+
+	var dados = JSON.parse(req.body);
+
+	console.log("text: " + dados.documents[0].text);
+
+	get_key_phrases (dados , function(err, data){
+		console.log(data);
+		res.send(data);
+	});
+})
+
 
 function get_language(documents , cb) {
     let data = JSON.stringify (documents);
-
-    /*var options = {
-		method : 'POST',
-		url : uri+pathLanguages,
-		headers: {
-			'Ocp-Apim-Subscription-Key' : accessKey,
-		},
-		body: data
-	};
-	console.log(JSON.stringify(options));
-	request(options, function (err, data) {
-		if(err){ console.log('error ' + err)};
-		var json = JSON.parse(data);
-		cb(null , json);
-
-	});*/
-
     let request_params = {
         method : 'POST',
         url : 'https://'+uri+pathLanguages,
         body : data,
         headers : {
-            'Ocp-Apim-Subscription-Key' : accessKey,
+            'Ocp-Apim-Subscription-Key' : documents.accessKey,
         }
     };
     console.log(request_params);
@@ -122,64 +119,50 @@ function get_language(documents , cb) {
 		cb(null , json);
 
 	});
-    /*request(request_params, function(response){
-    	let body = '';
-	    response.on ('data', function (d) {
-	        body += d;
-	    });
-	    response.on ('end', function () {
-	        let body_ = JSON.parse (body);
-	        let body__ = JSON.stringify (body_, null, '  ');
-	        console.log (body__);
-	        cb(null, body__);
-
-	    });
-	    response.on ('error', function (e) {
-	        console.log ('Error: ' + e.message);
-	    });
-    });*/
-    //req.write (data);
-    //req.end ();
-
-    //console.log(typeof req);
-    //console.log(response_handler);
-    //cb(null , response_handler);
-}
-/*
-function get_sentiments(documents) {
-    let body = JSON.stringify (documents);
-
-    let request_params = {
-        method : 'POST',
-        hostname : uri,
-        path : pathSentiment,
-        headers : {
-            'Ocp-Apim-Subscription-Key' : accessKey,
-        }
-    };
-
-    let req = https.request (request_params, response_handler);
-    req.write (body);
-    req.end ();
+    
 }
 
-function get_key_phrases(documents) {
-    let body = JSON.stringify (documents);
-
+function get_sentiments(documents , cb) {
+    let data = JSON.stringify (documents);
     let request_params = {
         method : 'POST',
-        hostname : uri,
-        path : pathKeyPhrases,
+        url : 'https://'+uri+pathSentiment,
+        body : data,
         headers : {
-            'Ocp-Apim-Subscription-Key' : accessKey,
+            'Ocp-Apim-Subscription-Key' : documents.accessKey,
         }
     };
+    console.log(request_params);
+    request(request_params, function (err, r, data) {
+		if(err){ console.log('error ' + err)};
+		var json = JSON.parse(data);
+		console.log("json" + json);
+		cb(null , json);
 
-    let req = https.request (request_params, response_handler);
-    req.write (body);
-    req.end ();
-}*/
+	});
+    
+}
 
+function get_key_phrases(documents , cb) {
+    let data = JSON.stringify (documents);
+    let request_params = {
+        method : 'POST',
+        url : 'https://'+uri+pathKeyPhrases,
+        body : data,
+        headers : {
+            'Ocp-Apim-Subscription-Key' : documents.accessKey,
+        }
+    };
+    console.log(request_params);
+    request(request_params, function (err, r, data) {
+		if(err){ console.log('error ' + err)};
+		var json = JSON.parse(data);
+		console.log("json" + json);
+		cb(null , json);
+
+	});
+    
+}
 
 //-------------------------- ga
 exports.getData = functions.https.onRequest(function(request , response){
@@ -367,5 +350,3 @@ function getOAuth2Client(project_id) {
             'urn:ietf:wg:oauth:2.0:oob'
         );
 }
-
-
